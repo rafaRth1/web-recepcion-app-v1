@@ -20,7 +20,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 			return NextResponse.json({ user: null }, { status: 401 });
 		}
 
-		const response = await fetch(`${BACKEND_URL}/api/v1/auth/profile`, {
+		const response = await fetch(`${BACKEND_URL}/api/v1/users/profile`, {
 			method: "GET",
 			headers: {
 				"Content-Type": "application/json",

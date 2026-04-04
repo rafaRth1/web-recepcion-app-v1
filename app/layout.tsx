@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Roboto_Mono, Roboto } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/shared/providers/auth-provider";
 import { QueryProvider } from "./query-provider";
 
-const geistSans = Geist({
-	variable: "--font-geist-sans",
+const robotoSans = Roboto({
+	variable: "--font-roboto-sans",
 	subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-	variable: "--font-geist-mono",
+const robotoMono = Roboto_Mono({
+	variable: "--font-roboto-mono",
 	subsets: ["latin"],
 });
 
@@ -25,7 +25,7 @@ export default function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+		<html lang="en" className={`${robotoSans.variable} ${robotoMono.variable} dark h-full antialiased`} data-theme="dark">
 			<body className="flex min-h-full flex-col">
 				<QueryProvider>
 					<AuthProvider>{children}</AuthProvider>
