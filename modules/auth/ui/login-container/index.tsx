@@ -6,6 +6,12 @@ import { TextField, Label, Input, FieldError, Button, Spinner, ErrorMessage } fr
 import { useFormik } from "formik";
 import { useLogin } from "../../application/use-login";
 import { loginSchema } from "../../domain/auth-schemas";
+import { UserRole } from "@/shared/types/user-role";
+
+const ROLE_REDIRECT: Record<UserRole, string> = {
+	ADMIN: "/dashboard/home",
+	CASHIER: "/dashboard/recepcion",
+};
 
 export const LoginContainer = () => {
 	const router = useRouter();
@@ -19,7 +25,8 @@ export const LoginContainer = () => {
 		validationSchema: loginSchema,
 		onSubmit: (values) => {
 			login.mutate(values, {
-				onSuccess: () => router.push("/home"),
+				onSuccess: (data) => router.push(ROLE_REDIRECT[data.user.role as UserRole]),
+				onError: (response) => {},
 			});
 		},
 	});

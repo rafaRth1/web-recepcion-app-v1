@@ -1,0 +1,266 @@
+"use client";
+
+import { useEffect } from "react";
+import { Modal, Button, TextField, Label, Input, FieldError, TextArea, Select, ListBox } from "@heroui/react";
+import { useFormik } from "formik";
+import { CategoryOption, CreateProductRequest, Product, UpdateProductRequest } from "@/modules/product/domain/product";
+import { createProductValidation, updateProductValidation } from "@/modules/product/domain/product-validation";
+
+interface ProductFormModalProps {
+	isOpen: boolean;
+	onOpenChange: (open: boolean) => void;
+	onSubmit: (values: CreateProductRequest | UpdateProductRequest) => void;
+	isPending: boolean;
+	editingProduct?: Product | null;
+	categories: CategoryOption[];
+}
+
+const initialValues: CreateProductRequest | UpdateProductRequest = {
+	name: "",
+	price: 0,
+	discount: 0,
+	image: "",
+	description: "",
+	ingredients: [],
+	tags: [],
+	categoryIds: [],
+	status: undefined,
+};
+
+export const ProductFormModal = ({
+	isOpen,
+	onOpenChange,
+	onSubmit,
+	isPending,
+	editingProduct,
+	categories,
+}: ProductFormModalProps) => {
+	const isEditing = !!editingProduct;
+
+	const formik = useFormik({
+		initialValues,
+		validationSchema: isEditing ? updateProductValidation : createProductValidation,
+		onSubmit: (values) => {
+			onSubmit({
+				...values,
+				ingredients:
+					typeof values.ingredients === "string"
+						? (values.ingredients as string)
+								.split(",")
+								.map((s) => s.trim())
+								.filter(Boolean)
+						: values.ingredients,
+				tags:
+					typeof values.tags === "string"
+						? (values.tags as string)
+								.split(",")
+								.map((s) => s.trim())
+								.filter(Boolean)
+						: values.tags,
+			});
+		},
+	});
+
+	useEffect(() => {
+		if (editingProduct) {
+			formik.setValues({
+				name: editingProduct.name,
+				price: editingProduct.price,
+				discount: editingProduct.discount,
+				image: editingProduct.image ?? "",
+				description: editingProduct.description ?? "",
+				ingredients: editingProduct.ingredients ?? [],
+				tags: editingProduct.tags ?? [],
+				categoryIds: editingProduct.categoryIds,
+				status: editingProduct.status,
+			});
+		} else {
+			formik.resetForm();
+		}
+	}, [editingProduct, isOpen]);
+
+	return (
+		<Modal>
+			<Modal.Backdrop isOpen={isOpen} onOpenChange={onOpenChange}>
+				<Modal.Container>
+					<Modal.Dialog>
+						{({ close }) => (
+							<>
+								<Modal.CloseTrigger />
+								<Modal.Header>
+									<Modal.Heading>{isEditing ? "Editar producto" : "Nuevo producto"}</Modal.Heading>
+								</Modal.Header>
+
+								<Modal.Body className="flex flex-col gap-4 px-1">
+									{/* Nombre */}
+									<TextField
+										aria-label="Nombre"
+										fullWidth
+										variant="secondary"
+										value={formik.values.name}
+										onChange={(val) => formik.setFieldValue("name", val)}
+										onBlur={() => formik.setFieldTouched("name")}
+										isInvalid={!!formik.touched.name && !!formik.errors.name}
+									>
+										<Label>Nombre</Label>
+										<Input placeholder="Ej: Hamburguesa clásica" />
+										<FieldError>{formik.errors.name}</FieldError>
+									</TextField>
+
+									{/* Precio */}
+									<TextField
+										aria-label="Precio"
+										fullWidth
+										variant="secondary"
+										value={String(formik.values.price)}
+										onChange={(val) => formik.setFieldValue("price", Number(val))}
+										onBlur={() => formik.setFieldTouched("price")}
+										isInvalid={!!formik.touched.price && !!formik.errors.price}
+									>
+										<Label>Precio (S/)</Label>
+										<Input placeholder="Ej: 18.50" />
+										<FieldError>{formik.errors.price}</FieldError>
+									</TextField>
+
+									{/* Descuento */}
+									<TextField
+										aria-label="Descuento"
+										fullWidth
+										variant="secondary"
+										value={String(formik.values.discount ?? 0)}
+										onChange={(val) => formik.setFieldValue("discount", Number(val))}
+										onBlur={() => formik.setFieldTouched("discount")}
+										isInvalid={!!formik.touched.discount && !!formik.errors.discount}
+									>
+										<Label>Descuento (%)</Label>
+										<Input placeholder="Ej: 10" />
+										<FieldError>{formik.errors.discount}</FieldError>
+									</TextField>
+
+									{/* Imagen */}
+									<TextField
+										aria-label="Imagen"
+										fullWidth
+										variant="secondary"
+										value={formik.values.image ?? ""}
+										onChange={(val) => formik.setFieldValue("image", val)}
+									>
+										<Label>URL de imagen</Label>
+										<Input placeholder="Ej: https://imagen.com/burger.png" />
+									</TextField>
+
+									{/* Descripción */}
+									<TextField
+										aria-label="Descripción"
+										fullWidth
+										variant="secondary"
+										value={formik.values.description ?? ""}
+										onChange={(val) => formik.setFieldValue("description", val)}
+									>
+										<Label>Descripción</Label>
+										<TextArea placeholder="Descripción opcional..." rows={3} />
+									</TextField>
+
+									{/* Ingredientes */}
+									<TextField
+										aria-label="Ingredientes"
+										fullWidth
+										variant="secondary"
+										value={
+											Array.isArray(formik.values.ingredients)
+												? formik.values.ingredients.join(", ")
+												: (formik.values.ingredients ?? "")
+										}
+										onChange={(val) => formik.setFieldValue("ingredients", val)}
+									>
+										<Label>Ingredientes</Label>
+										<Input placeholder="Ej: lechuga, tomate, cebolla, queso" />
+									</TextField>
+
+									{/* Tags */}
+									<TextField
+										aria-label="Tags"
+										fullWidth
+										variant="secondary"
+										value={
+											Array.isArray(formik.values.tags) ? formik.values.tags.join(", ") : (formik.values.tags ?? "")
+										}
+										onChange={(val) => formik.setFieldValue("tags", val)}
+									>
+										<Label>Tags</Label>
+										<Input placeholder="Ej: popular, oferta, nuevo" />
+									</TextField>
+
+									{/* Categorías */}
+									<Select
+										aria-label="Categorías"
+										fullWidth
+										variant="secondary"
+										selectionMode="multiple"
+										placeholder="Seleccionar categorías"
+										value={formik.values.categoryIds}
+										onChange={(keys) => formik.setFieldValue("categoryIds", keys as string[])}
+										isInvalid={!!formik.touched.categoryIds && !!formik.errors.categoryIds}
+									>
+										<Label>Categorías</Label>
+										<Select.Trigger>
+											<Select.Value />
+											<Select.Indicator />
+										</Select.Trigger>
+										<Select.Popover>
+											<ListBox selectionMode="multiple">
+												{categories.map((cat) => (
+													<ListBox.Item key={cat._id} id={cat._id} textValue={cat.name}>
+														{cat.name}
+														<ListBox.ItemIndicator />
+													</ListBox.Item>
+												))}
+											</ListBox>
+										</Select.Popover>
+									</Select>
+									<FieldError>{formik.errors.categoryIds as string}</FieldError>
+
+									{/* Estado — solo al editar */}
+									{isEditing && (
+										<Select
+											aria-label="Estado"
+											fullWidth
+											variant="secondary"
+											value={(formik.values as UpdateProductRequest).status ?? "ACTIVE"}
+											onChange={(val) => formik.setFieldValue("status", val)}
+										>
+											<Label>Estado</Label>
+											<Select.Trigger>
+												<Select.Value />
+												<Select.Indicator />
+											</Select.Trigger>
+											<Select.Popover>
+												<ListBox>
+													<ListBox.Item id="ACTIVE" textValue="Activo">
+														Activo <ListBox.ItemIndicator />
+													</ListBox.Item>
+													<ListBox.Item id="INACTIVE" textValue="Inactivo">
+														Inactivo <ListBox.ItemIndicator />
+													</ListBox.Item>
+												</ListBox>
+											</Select.Popover>
+										</Select>
+									)}
+								</Modal.Body>
+
+								<Modal.Footer>
+									<Button variant="ghost" isDisabled={isPending} onPress={close}>
+										Cancelar
+									</Button>
+									<Button variant="primary" isPending={isPending} onPress={() => formik.handleSubmit()}>
+										{({ isPending: pending }) => <>{pending ? "Guardando..." : isEditing ? "Actualizar" : "Crear"}</>}
+									</Button>
+								</Modal.Footer>
+							</>
+						)}
+					</Modal.Dialog>
+				</Modal.Container>
+			</Modal.Backdrop>
+		</Modal>
+	);
+};
