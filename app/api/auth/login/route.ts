@@ -28,11 +28,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 			body: JSON.stringify(body),
 		});
 
-		console.log("response", response);
-
 		const data = (await response.json()) as ApiResponse<NestLoginResponse>;
-
-		console.log("data", data);
 
 		if (!response.ok) {
 			return NextResponse.json({ message: data?.message ?? "Credenciales inválidas" }, { status: response.status });

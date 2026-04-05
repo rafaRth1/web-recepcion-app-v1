@@ -3,6 +3,7 @@ import { Roboto_Mono, Roboto } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/shared/providers/auth-provider";
 import { QueryProvider } from "./query-provider";
+import { Toast } from "@heroui/react";
 
 const robotoSans = Roboto({
 	variable: "--font-roboto-sans",
@@ -27,6 +28,7 @@ export default function RootLayout({
 	return (
 		<html lang="en" className={`${robotoSans.variable} ${robotoMono.variable} dark h-full antialiased`} data-theme="dark">
 			<body className="flex min-h-full flex-col">
+				<Toast.Provider placement="top" />
 				<QueryProvider>
 					<AuthProvider>{children}</AuthProvider>
 				</QueryProvider>

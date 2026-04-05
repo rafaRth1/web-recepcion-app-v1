@@ -4,8 +4,8 @@ import { useRouter } from "next/navigation";
 import { Button } from "@heroui/react";
 import { LogOut } from "lucide-react";
 import { useAuth } from "@/shared/providers/auth-provider";
-import { logoutAction } from "@/modules/auth/infrastructure/auth-service";
 import { useSidebar } from "./sidebar-context";
+import { logoutAction } from "@/modules/auth/services";
 
 export const NavUser = () => {
 	const { user } = useAuth();

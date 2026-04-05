@@ -1,13 +1,13 @@
 "use client";
-
-import { Beef, LayoutDashboard, Tag } from "lucide-react";
+import { Beef, LayoutDashboard, Tag, ClipboardList } from "lucide-react";
 import { Sidebar } from "./sidebar";
 import { NavMain } from "./nav-main";
 import { NavUser } from "./nav-user";
 import { useSidebar } from "./sidebar-context";
+import { useAuth } from "@/shared/providers/auth-provider";
 import type { NavItem } from "./nav-main";
 
-const items: NavItem[] = [
+const adminItems: NavItem[] = [
 	{
 		title: "Inicio",
 		url: "/dashboard/home",
@@ -25,9 +25,16 @@ const items: NavItem[] = [
 	},
 ];
 
+const cashierItems: NavItem[] = [
+	{
+		title: "Recepción",
+		url: "/dashboard/recepcion",
+		icon: ClipboardList,
+	},
+];
+
 const SidebarHeader = () => {
 	const { isCollapsed } = useSidebar();
-
 	return (
 		<div className={`flex items-center py-4 ${isCollapsed ? "justify-center px-0" : "gap-2 px-4"}`}>
 			<div className="bg-accent flex h-8 w-8 shrink-0 items-center justify-center rounded-md">
@@ -39,6 +46,9 @@ const SidebarHeader = () => {
 };
 
 export const AppSidebar = () => {
+	const { user } = useAuth();
+	const items = user?.role === "ADMIN" ? adminItems : cashierItems;
+
 	return (
 		<Sidebar header={<SidebarHeader />} footer={<NavUser />}>
 			<NavMain items={items} label="Menú" />

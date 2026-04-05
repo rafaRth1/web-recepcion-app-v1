@@ -4,8 +4,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { TextField, Label, Input, FieldError, Button, Spinner, ErrorMessage } from "@heroui/react";
 import { useFormik } from "formik";
-import { useRegister } from "@/modules/auth/application/use-register";
-import { registerSchema } from "@/modules/auth/domain/auth-schemas";
+import { useRegister } from "@/modules/auth/hooks/use-register";
+import { registerSchema } from "@/modules/auth/validations";
 
 export default function RegisterPage() {
 	const router = useRouter();
