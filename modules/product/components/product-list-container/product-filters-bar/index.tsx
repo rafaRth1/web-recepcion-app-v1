@@ -1,9 +1,9 @@
 "use client";
 
 import { Input, Label, ListBox, Select, Slider, TextField } from "@heroui/react";
-import { CategoryOption } from "../../../../shared/domain/product";
 import { Status } from "@/shared/types/status";
 import { Key } from "react";
+import { CategoryOption } from "@/modules/product/interfaces";
 
 interface ProductFiltersBarProps {
 	search: string;

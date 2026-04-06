@@ -12,8 +12,9 @@ import { useUpdateCategory } from "@/modules/categories/hooks/use-update-categor
 import { useDeleteCategory } from "@/modules/categories/hooks/use-delete-category";
 import { Status } from "@/shared/types/status";
 import { useDebounce } from "@/shared/hooks/use-debounce";
-import { Category, GetCategoriesPaginatedParams } from "../../interfaces";
+import { GetCategoriesPaginatedParams } from "../../interfaces";
 import { CreateCategoryFormValues } from "../../validations";
+import { Category } from "@/modules/shared/interfaces/category";
 
 const generateSlug = (name: string) =>
 	name

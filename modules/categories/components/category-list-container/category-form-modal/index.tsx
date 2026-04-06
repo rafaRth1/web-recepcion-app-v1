@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { Modal, Button, TextField, Label, Input, FieldError, TextArea, Select, ListBox } from "@heroui/react";
 import { useFormik } from "formik";
 import { CreateCategoryFormValues, createCategorySchema } from "@/modules/categories/validations";
-import { Category } from "@/modules/categories/interfaces";
+import { Category } from "@/modules/shared/interfaces/category";
 
 interface CategoryFormModalProps {
 	isOpen: boolean;

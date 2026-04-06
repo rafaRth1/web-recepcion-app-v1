@@ -26,13 +26,7 @@ const AppSidebar = dynamic(() => import("@/shared/components/sidebar/app-sidebar
 });
 
 // Rutas donde NO mostrar el botón back
-const HIDDEN_BACK_ROUTES = [
-	"/dashboard/home",
-	"/dashboard/category",
-	"/dashboard/product",
-	"/dashboard/orders",
-	"/dashboard/users",
-];
+const HIDDEN_BACK_ROUTES = ["/dashboard/category", "/dashboard/product", "/dashboard/orders", "/dashboard/users"];
 
 function AdminContent({ children }: { children: React.ReactNode }) {
 	const pathname = usePathname();

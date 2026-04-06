@@ -7,8 +7,16 @@ export async function POST(): Promise<NextResponse> {
 
 	res.cookies.set(TOKEN_KEY, "", {
 		httpOnly: true,
-		secure: process.env.NODE_ENV === "production",
-		sameSite: "strict",
+		secure: false,
+		sameSite: "lax",
+		path: "/",
+		maxAge: 0,
+	});
+
+	res.cookies.set("user_role", "", {
+		httpOnly: true,
+		secure: false,
+		sameSite: "lax",
 		path: "/",
 		maxAge: 0,
 	});

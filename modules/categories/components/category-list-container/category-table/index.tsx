@@ -1,8 +1,8 @@
 "use client";
 
+import { Category } from "@/modules/shared/interfaces/category";
 import { Table, Button, Chip, EmptyState } from "@heroui/react";
-import { Icon, Pencil, Trash2 } from "lucide-react";
-import type { Category } from "@/modules/categories/domain/category";
+import { Pencil, Trash2 } from "lucide-react";
 
 interface CategoryTableProps {
 	categories: Category[];

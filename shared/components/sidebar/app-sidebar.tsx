@@ -9,11 +9,6 @@ import type { NavItem } from "./nav-main";
 
 const adminItems: NavItem[] = [
 	{
-		title: "Inicio",
-		url: "/dashboard/home",
-		icon: LayoutDashboard,
-	},
-	{
 		title: "Categorías",
 		url: "/dashboard/category",
 		icon: Tag,

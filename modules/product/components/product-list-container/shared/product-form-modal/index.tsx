@@ -3,9 +3,9 @@
 import { useEffect } from "react";
 import { Modal, Button, TextField, Label, Input, FieldError, Select, ListBox } from "@heroui/react";
 import { useFormik } from "formik";
-import { CategoryOption, CreateProductRequest, Product, UpdateProductRequest } from "@/modules/product/interfaces";
+import { CategoryOption, CreateProductRequest, UpdateProductRequest } from "@/modules/product/interfaces";
 import { createProductValidation, updateProductValidation } from "@/modules/product/validations";
-import { ProductType } from "@/modules/shared/interfaces/product";
+import { Product, ProductType } from "@/modules/shared/interfaces/product";
 
 interface ProductFormModalProps {
 	isOpen: boolean;

@@ -8,7 +8,7 @@ import { AuthResponse, LoginCredentials, RegisterRequest } from "../interfaces";
  */
 export const loginAction = async (credentials: LoginCredentials) => {
 	try {
-		const { data } = await axios.post<AuthResponse, LoginCredentials>("/api/auth/login", credentials);
+		const { data } = await axios.post<AuthResponse>("/api/auth/login", credentials);
 
 		return data;
 	} catch (error) {

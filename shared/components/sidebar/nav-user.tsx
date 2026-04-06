@@ -8,7 +8,7 @@ import { useSidebar } from "./sidebar-context";
 import { logoutAction } from "@/modules/auth/services";
 
 export const NavUser = () => {
-	const { user } = useAuth();
+	const { user, isLoading } = useAuth();
 	const { isCollapsed } = useSidebar();
 	const router = useRouter();
 
@@ -21,11 +21,16 @@ export const NavUser = () => {
 		<div className="flex items-center gap-3 px-3 py-3">
 			{!isCollapsed && (
 				<div className="min-w-0 flex-1">
-					<p className="truncate text-sm font-medium">{user?.name}</p>
-					<p className="text-default-400 truncate text-xs">{user?.email}</p>
+					{isLoading ? (
+						<div className="bg-default-200 h-4 w-24 animate-pulse rounded" />
+					) : (
+						<>
+							<p className="truncate text-sm font-medium">{user?.name}</p>
+							<p className="text-default-400 truncate text-xs">{user?.email}</p>
+						</>
+					)}
 				</div>
 			)}
-
 			<Button variant="tertiary" size="sm" isIconOnly onPress={handleLogout} className="text-danger shrink-0">
 				<LogOut size={16} />
 			</Button>

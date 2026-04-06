@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 interface AuthUser {
 	id: string;
@@ -25,22 +25,31 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+const ROLE_HOME: Record<string, string> = {
+	ADMIN: "/dashboard/category",
+	CASHIER: "/dashboard/recepcion",
+};
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
 	const [user, setUser] = useState<AuthUser | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const router = useRouter();
+	const pathname = usePathname();
 
 	useEffect(() => {
+		console.log("AuthProvider mounted — calling fetchSession");
 		fetchSession();
-	}, []);
+	}, [pathname]);
 
-	async function fetchSession(): Promise<void> {
+	async function fetchSession(): Promise<AuthUser | null> {
 		try {
 			const res = await fetch("/api/auth/session");
 			const data = (await res.json()) as { user: AuthUser | null };
 			setUser(data.user);
+			return data.user;
 		} catch {
 			setUser(null);
+			return null;
 		} finally {
 			setIsLoading(false);
 		}
@@ -59,8 +68,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 		}
 
 		const data = (await res.json()) as { user: AuthUser };
-		setUser(data.user);
-		router.push("/home");
+		window.location.href = ROLE_HOME[data.user.role] ?? "/login";
 	}
 
 	async function logout(): Promise<void> {
