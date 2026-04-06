@@ -18,7 +18,7 @@ interface RecepcionContextProps {
 	handleDeletePendingOrder: (id: string) => void;
 }
 
-const RecepcionContext = createContext<RecepcionContextProps>({} as RecepcionContextProps);
+export const RecepcionContext = createContext<RecepcionContextProps>({} as RecepcionContextProps);
 
 export const useRecepcionContext = () => {
 	const context = useContext(RecepcionContext);

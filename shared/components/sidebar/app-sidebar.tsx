@@ -1,5 +1,5 @@
 "use client";
-import { Beef, LayoutDashboard, Tag, ClipboardList } from "lucide-react";
+import { Beef, LayoutDashboard, Tag, ClipboardList, Receipt } from "lucide-react";
 import { Sidebar } from "./sidebar";
 import { NavMain } from "./nav-main";
 import { NavUser } from "./nav-user";
@@ -30,6 +30,11 @@ const cashierItems: NavItem[] = [
 		title: "Recepción",
 		url: "/dashboard/recepcion",
 		icon: ClipboardList,
+	},
+	{
+		title: "Órdenes",
+		url: "/dashboard/order",
+		icon: Receipt,
 	},
 ];
 

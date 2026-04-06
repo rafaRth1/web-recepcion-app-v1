@@ -49,3 +49,15 @@ export const updateOrderAction = async (id: string, body: UpdateOrderRequest): P
 		throw error;
 	}
 };
+
+/**
+ * @description Completa una orden por su ID
+ **/
+export const completeOrderAction = async (id: string): Promise<ApiResponse<Order>> => {
+	try {
+		const { data } = await apiClient.patch<ApiResponse<Order>>(`/api/v1/orders/${id}/complete`);
+		return data;
+	} catch (error) {
+		throw error;
+	}
+};

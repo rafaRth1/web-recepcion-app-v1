@@ -4,6 +4,7 @@ import { getOrdersAction } from "../services";
 export interface GetOrdersQueryOptions {
 	enabled?: boolean;
 	staleTime?: number;
+	refetchInterval?: number;
 }
 
 export const useGetOrders = ({
