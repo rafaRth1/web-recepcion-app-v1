@@ -24,6 +24,12 @@ export function proxy(req: NextRequest): NextResponse {
 		return NextResponse.rewrite(url, { request: { headers: requestHeaders } });
 	}
 
+	if (pathname === "/") {
+		const url = req.nextUrl.clone();
+		url.pathname = "/login";
+		return NextResponse.redirect(url);
+	}
+
 	const isPublic = PUBLIC_ROUTES.some((route) => pathname.startsWith(route));
 	const isDashboard = DASHBOARD_ROUTES.some((route) => pathname.startsWith(route));
 
