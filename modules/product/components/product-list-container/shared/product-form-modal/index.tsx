@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useEffect } from "react";
 import { Modal, Button, TextField, Label, Input, FieldError, Select, ListBox } from "@heroui/react";
 import { useFormik } from "formik";
@@ -38,6 +39,7 @@ export const ProductFormModal = ({
 	categories,
 }: ProductFormModalProps) => {
 	const isEditing = !!editingProduct;
+	const [priceDisplay, setPriceDisplay] = useState("");
 
 	const formik = useFormik({
 		initialValues,
@@ -65,6 +67,7 @@ export const ProductFormModal = ({
 
 	useEffect(() => {
 		if (editingProduct) {
+			setPriceDisplay(String(editingProduct.price));
 			formik.setValues({
 				name: editingProduct.name,
 				price: editingProduct.price,
@@ -77,9 +80,29 @@ export const ProductFormModal = ({
 				status: editingProduct.status,
 			});
 		} else {
+			setPriceDisplay("");
 			formik.resetForm();
 		}
 	}, [editingProduct, isOpen]);
+
+	const handlePriceChange = (val: string) => {
+		// Allow comma as decimal separator and limit to 2 decimals
+		let normalized = val.replace(",", ".");
+		// Remove any non-numeric characters except dot
+		normalized = normalized.replace(/[^0-9.]/g, "");
+		// Ensure only one dot
+		const parts = normalized.split(".");
+		if (parts.length > 2) {
+			normalized = parts[0] + "." + parts.slice(1).join("");
+		}
+		// Limit to 2 decimal places
+		if (parts[1] && parts[1].length > 2) {
+			normalized = parts[0] + "." + parts[1].slice(0, 2);
+		}
+		setPriceDisplay(normalized);
+		const numValue = normalized === "" || normalized === "." ? 0 : Number(normalized);
+		formik.setFieldValue("price", isNaN(numValue) ? 0 : numValue);
+	};
 
 	return (
 		<Modal>
@@ -114,9 +137,16 @@ export const ProductFormModal = ({
 										aria-label="Precio"
 										fullWidth
 										variant="secondary"
-										value={String(formik.values.price)}
-										onChange={(val) => formik.setFieldValue("price", Number(val))}
-										onBlur={() => formik.setFieldTouched("price")}
+										value={priceDisplay}
+										onChange={handlePriceChange}
+										onBlur={() => {
+											formik.setFieldTouched("price");
+											// Normalize display on blur
+											const num = Number(priceDisplay);
+											if (!isNaN(num)) {
+												setPriceDisplay(num.toFixed(2));
+											}
+										}}
 										isInvalid={!!formik.touched.price && !!formik.errors.price}
 									>
 										<Label>Precio (S/)</Label>
