@@ -8,7 +8,7 @@ const PUBLIC_ROUTES = ["/login", "/register"];
 const INTERNAL_API_ROUTES = ["/api/auth"];
 
 const ROLE_ROUTES: Record<string, string[]> = {
-	ADMIN: ["/dashboard/category", "/dashboard/product"],
+	ADMIN: ["/dashboard/category", "/dashboard/product", "/dashboard/orders"],
 	CASHIER: ["/dashboard/order", "/dashboard/recepcion"],
 };
 

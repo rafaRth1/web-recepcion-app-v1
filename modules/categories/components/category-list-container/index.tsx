@@ -123,6 +123,7 @@ export const CategoryListContainer = () => {
 				</TextField>
 
 				<Select
+					aria-label="Seleccionar estados"
 					placeholder="Todos los estados"
 					value={statusFilter ?? null}
 					onChange={(val) => {

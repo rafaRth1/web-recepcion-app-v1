@@ -1,6 +1,7 @@
 import { ApiResponse } from "@/shared/types/api-response";
+import { PaginatedResult } from "@/shared/types/paginated-result";
 import { apiClient } from "@/lib/http-client";
-import { CreateOrderRequest, Order, UpdateOrderRequest } from "../interfaces";
+import { CreateOrderRequest, GetOrdersPaginatedParams, Order, UpdateOrderRequest } from "../interfaces";
 
 /**
  * @description Crea una nueva orden
@@ -57,6 +58,24 @@ export const completeOrderAction = async (id: string): Promise<ApiResponse<Order
 	try {
 		const { data } = await apiClient.patch<ApiResponse<Order>>(`/api/v1/orders/${id}/complete`);
 		return data;
+	} catch (error) {
+		throw error;
+	}
+};
+
+/**
+ * @description Obtiene todas las órdenes con paginación y filtros (Admin)
+ **/
+export const getOrdersPaginatedAction = async (params: GetOrdersPaginatedParams) => {
+	try {
+		const filteredParams = Object.fromEntries(
+			Object.entries(params).filter(([, v]) => v !== undefined && v !== "")
+		);
+		const { data } = await apiClient.get<ApiResponse<PaginatedResult<Order[]>>>(
+			"/api/v1/orders/paginated",
+			{ params: filteredParams }
+		);
+		return data.data;
 	} catch (error) {
 		throw error;
 	}

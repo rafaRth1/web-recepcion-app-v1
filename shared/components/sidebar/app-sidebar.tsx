@@ -1,5 +1,5 @@
 "use client";
-import { Beef, LayoutDashboard, Tag, ClipboardList, Receipt } from "lucide-react";
+import { Beef, Tag, ClipboardList, Receipt, ShoppingCart } from "lucide-react";
 import { Sidebar } from "./sidebar";
 import { NavMain } from "./nav-main";
 import { NavUser } from "./nav-user";
@@ -17,6 +17,11 @@ const adminItems: NavItem[] = [
 		title: "Productos",
 		url: "/dashboard/product",
 		icon: Beef,
+	},
+	{
+		title: "Órdenes",
+		url: "/dashboard/orders",
+		icon: ShoppingCart,
 	},
 ];
 

@@ -69,3 +69,15 @@ export const initialLocalOrder: LocalOrder = {
 	paymentType: "",
 	type: "TABLE",
 };
+
+export interface GetOrdersPaginatedParams {
+	page: number;
+	limit: number;
+	search?: string;
+	paymentType?: PaymentType;
+	status?: OrderStatus;
+	deliveryStatus?: DeliveryStatus;
+	type?: OrderType;
+	startDate?: string;
+	endDate?: string;
+}
