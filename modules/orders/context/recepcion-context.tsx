@@ -3,8 +3,17 @@
 import { createContext, useContext, useState } from "react";
 import { v4 } from "uuid";
 import { toast } from "@heroui/react";
-import { initialLocalOrder, LocalOrder, OrderItem } from "../interfaces";
+import { initialLocalOrder, LocalOrder, OrderItem, OrderType } from "../interfaces";
 import { useLocalStorage } from "@/shared/hooks/use-local-storage";
+
+const DISPOSABLE_PRICE = 1.0;
+
+const calculateDisposableCharge = (items: OrderItem[], orderType: OrderType): number => {
+	const isDeliveryOrPickup = orderType === "DELIVERY" || orderType === "PICKUP";
+	if (!isDeliveryOrPickup) return 0;
+	const disposableCount = items.filter((item) => item.chargeDisposable).length;
+	return disposableCount * DISPOSABLE_PRICE;
+};
 
 interface RecepcionContextProps {
 	order: LocalOrder;
@@ -13,6 +22,7 @@ interface RecepcionContextProps {
 	setPendingOrders: React.Dispatch<React.SetStateAction<LocalOrder[]>>;
 	addItem: (item: OrderItem) => void;
 	removeItem: (index: number) => void;
+	toggleItemDisposable: (index: number) => void;
 	handleSaveOrder: () => void;
 	handleEditOrder: (order: LocalOrder) => void;
 	handleDeletePendingOrder: (id: string) => void;
@@ -33,20 +43,45 @@ export const RecepcionProvider = ({ children }: { children: React.ReactNode }) =
 	const [pendingOrders, setPendingOrders] = useLocalStorage<LocalOrder[]>("pending-orders", []);
 
 	const addItem = (item: OrderItem) => {
-		setOrder((prev) => ({
-			...prev,
-			items: [...prev.items, item],
-			totalPrice: prev.totalPrice + item.price,
-		}));
+		setOrder((prev) => {
+			const newItems = [...prev.items, item];
+			const itemsTotal = newItems.reduce((acc, i) => acc + i.price, 0);
+			const disposableCharge = calculateDisposableCharge(newItems, prev.type);
+			return {
+				...prev,
+				items: newItems,
+				totalPrice: itemsTotal + disposableCharge,
+				disposableCharge,
+			};
+		});
 	};
 
 	const removeItem = (index: number) => {
 		setOrder((prev) => {
-			const removed = prev.items[index];
+			const newItems = prev.items.filter((_, i) => i !== index);
+			const itemsTotal = newItems.reduce((acc, i) => acc + i.price, 0);
+			const disposableCharge = calculateDisposableCharge(newItems, prev.type);
 			return {
 				...prev,
-				items: prev.items.filter((_, i) => i !== index),
-				totalPrice: prev.totalPrice - removed.price,
+				items: newItems,
+				totalPrice: itemsTotal + disposableCharge,
+				disposableCharge,
+			};
+		});
+	};
+
+	const toggleItemDisposable = (index: number) => {
+		setOrder((prev) => {
+			const newItems = prev.items.map((item, i) =>
+				i === index ? { ...item, chargeDisposable: !item.chargeDisposable } : item
+			);
+			const itemsTotal = newItems.reduce((acc, i) => acc + i.price, 0);
+			const disposableCharge = calculateDisposableCharge(newItems, prev.type);
+			return {
+				...prev,
+				items: newItems,
+				totalPrice: itemsTotal + disposableCharge,
+				disposableCharge,
 			};
 		});
 	};
@@ -83,6 +118,7 @@ export const RecepcionProvider = ({ children }: { children: React.ReactNode }) =
 				setPendingOrders,
 				addItem,
 				removeItem,
+				toggleItemDisposable,
 				handleSaveOrder,
 				handleEditOrder,
 				handleDeletePendingOrder,

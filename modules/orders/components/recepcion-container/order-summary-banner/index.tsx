@@ -11,6 +11,7 @@ export const OrderSummaryBanner = ({ onOpenDetail }: Props) => {
 
 	const totalItems = order.items.length;
 	const previewItems = order.items.slice(0, 3).map((item) => item.name);
+	const isDeliveryOrPickup = order.type === "DELIVERY" || order.type === "PICKUP";
 
 	return (
 		<div
@@ -25,6 +26,11 @@ export const OrderSummaryBanner = ({ onOpenDetail }: Props) => {
 					<span className="rounded-full bg-white/20 px-2 py-0.5 text-xs font-semibold text-white">
 						{totalItems} {totalItems === 1 ? "item" : "items"}
 					</span>
+					{isDeliveryOrPickup && order.disposableCharge > 0 && (
+						<span className="rounded-full bg-orange-500/30 px-2 py-0.5 text-xs font-semibold text-orange-200">
+							📦 {order.items.filter((i) => i.chargeDisposable).length} desc.
+						</span>
+					)}
 				</div>
 				<div className="flex items-center gap-2">
 					<span className="text-xl font-bold text-white">S/ {order.totalPrice.toFixed(2)}</span>

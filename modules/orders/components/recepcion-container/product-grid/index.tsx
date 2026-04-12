@@ -37,6 +37,7 @@ export const ProductGrid = () => {
 			price: product.price,
 			extras: [],
 			creams: [],
+			chargeDisposable: false,
 		};
 		addItem(item);
 	};

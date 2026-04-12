@@ -10,6 +10,7 @@ export interface OrderItem {
 	price: number;
 	extras: string[];
 	creams: string[];
+	chargeDisposable: boolean;
 }
 
 export interface Order {
@@ -17,6 +18,7 @@ export interface Order {
 	nameOrder: string;
 	items: OrderItem[];
 	totalPrice: number;
+	disposableCharge: number;
 	exception: string;
 	momentaryTime: string;
 	paymentType: PaymentType;
@@ -55,6 +57,7 @@ export interface LocalOrder {
 	nameOrder: string;
 	items: OrderItem[];
 	totalPrice: number;
+	disposableCharge: number;
 	exception: string;
 	paymentType: PaymentType | "";
 	type: OrderType;
@@ -65,6 +68,7 @@ export const initialLocalOrder: LocalOrder = {
 	nameOrder: "",
 	items: [],
 	totalPrice: 0,
+	disposableCharge: 0,
 	exception: "",
 	paymentType: "",
 	type: "TABLE",

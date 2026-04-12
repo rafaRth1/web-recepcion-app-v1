@@ -3,7 +3,7 @@
 import { useRecepcionContext } from "@/modules/orders/context/recepcion-context";
 import { initialLocalOrder, OrderItem } from "@/modules/orders/interfaces";
 import { Button, Modal, toast } from "@heroui/react";
-import { Trash, Settings, AlertCircle, CheckCircle } from "lucide-react";
+import { Trash, Settings, AlertCircle, CheckCircle, Package } from "lucide-react";
 
 interface Props {
 	isOpen: boolean;
@@ -18,18 +18,27 @@ const PAYMENT_OPTIONS = [
 ] as const;
 
 export const ModalOrderDetail = ({ isOpen, onClose, onOpenExtras }: Props) => {
-	const { order, setOrder, handleSaveOrder } = useRecepcionContext();
+	const { order, setOrder, handleSaveOrder, toggleItemDisposable } = useRecepcionContext();
 
 	const hasItems = order.items.length > 0;
 	const showPayment = order.type === "DELIVERY" || order.type === "PICKUP";
+	const showDisposableToggle = showPayment;
+	const itemsTotal = order.items.reduce((acc, item) => acc + item.price, 0);
 
 	const handleRemoveItem = (index: number) => {
 		const removed = order.items[index];
 		const updatedItems = order.items.filter((_, i) => i !== index);
+		const newItemsTotal = updatedItems.reduce((acc, item) => acc + item.price, 0);
+		const isDeliveryOrPickup = order.type === "DELIVERY" || order.type === "PICKUP";
+		const newDisposableCount = isDeliveryOrPickup
+			? updatedItems.filter((item) => item.chargeDisposable).length
+			: 0;
+		const newDisposableCharge = newDisposableCount * 1.0;
 		setOrder({
 			...order,
 			items: updatedItems,
-			totalPrice: order.totalPrice - removed.price,
+			totalPrice: newItemsTotal + newDisposableCharge,
+			disposableCharge: newDisposableCharge,
 		});
 	};
 
@@ -87,6 +96,32 @@ export const ModalOrderDetail = ({ isOpen, onClose, onOpenExtras }: Props) => {
 												</div>
 											)}
 
+											{/* Disposable toggle for DELIVERY/PICKUP */}
+											{showDisposableToggle && (
+												<div className="mb-2 flex items-center gap-2">
+													<button
+														onClick={() => toggleItemDisposable(index)}
+														className={`flex w-full items-center justify-between rounded-lg border-2 p-2 transition-all duration-200 ${
+															item.chargeDisposable
+																? "border-orange-600 bg-orange-600/20 text-orange-400"
+																: "border-neutral-700 bg-neutral-800 text-neutral-400"
+														} `}
+													>
+														<div className="flex items-center gap-2">
+															<Package size={14} />
+															<span className="text-xs font-medium">Descartable (S/1.00)</span>
+														</div>
+														<div
+															className={`relative h-5 w-9 rounded-full transition-all duration-200 ${item.chargeDisposable ? "bg-orange-600" : "bg-neutral-600"}`}
+														>
+															<div
+																className={`absolute top-0.5 h-4 w-4 rounded-full bg-white transition-all duration-200 ${item.chargeDisposable ? "right-0.5" : "left-0.5"}`}
+															/>
+														</div>
+													</button>
+												</div>
+											)}
+
 											<div className="flex gap-2">
 												{item.type === "DISH" && (
 													<Button
@@ -126,6 +161,28 @@ export const ModalOrderDetail = ({ isOpen, onClose, onOpenExtras }: Props) => {
 						</Modal.Body>
 
 						<Modal.Footer className="flex-col gap-3 border-t border-neutral-800">
+							{/* Resumen de precios */}
+							{hasItems && (
+								<div className="w-full rounded-lg bg-neutral-800 p-3">
+									<div className="space-y-1 text-sm">
+										<div className="flex justify-between text-neutral-400">
+											<span>Subtotal items</span>
+											<span>S/ {itemsTotal.toFixed(2)}</span>
+										</div>
+										{showPayment && order.disposableCharge > 0 && (
+											<div className="flex justify-between text-orange-400">
+												<span>Descartables ({order.items.filter((i) => i.chargeDisposable).length} items)</span>
+												<span>S/ {order.disposableCharge.toFixed(2)}</span>
+											</div>
+										)}
+										<div className="flex justify-between border-t border-neutral-700 pt-1 text-base font-bold text-white">
+											<span>Total</span>
+											<span>S/ {order.totalPrice.toFixed(2)}</span>
+										</div>
+									</div>
+								</div>
+							)}
+
 							{/* Tipo de pago */}
 							{showPayment && hasItems && (
 								<div className="w-full">
