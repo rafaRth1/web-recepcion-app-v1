@@ -1,8 +1,10 @@
 "use client";
 
 import { Button } from "@heroui/react";
-import { Pencil, CheckCircle, Trash, AlertCircle, UtensilsCrossed, Car, ShoppingBag } from "lucide-react";
+import { Pencil, CheckCircle, Trash, AlertCircle, UtensilsCrossed, Car, ShoppingBag, Printer } from "lucide-react";
 import { useCreateOrder } from "../../../hooks/use-create-order";
+import { usePrintDirectTicket } from "@/modules/shared/hooks/printer/use-print-direct-ticket";
+import { PrintDirectTicketDto } from "@/modules/shared/interfaces/printer";
 import { toast } from "@heroui/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { CreateOrderRequest, LocalOrder } from "@/modules/orders/interfaces";
@@ -33,6 +35,7 @@ interface Props {
 export const PendingOrders = ({ onSwitchToNew }: Props) => {
 	const { pendingOrders, handleDeletePendingOrder, handleEditOrder } = useRecepcionContext();
 	const { createOrder } = useCreateOrder();
+	const { printDirectTicket } = usePrintDirectTicket();
 	const queryClient = useQueryClient();
 
 	const handleFinish = (localOrder: LocalOrder) => {
@@ -46,12 +49,35 @@ export const PendingOrders = ({ onSwitchToNew }: Props) => {
 
 		createOrder.mutate(request, {
 			onSuccess: (response) => {
-				toast.success(response.message);
+				toast.success(response.message, {
+					timeout: 500,
+				});
 				handleDeletePendingOrder(localOrder.id);
 				queryClient.invalidateQueries({ queryKey: ["orders"] });
 			},
 			onError: (error) => {
 				toast.danger(error.message || "Error al crear la orden");
+			},
+		});
+	};
+
+	const handlePrint = (localOrder: LocalOrder) => {
+		const dto: PrintDirectTicketDto = {
+			nameOrder: localOrder.nameOrder,
+			items: localOrder.items,
+			totalPrice: localOrder.totalPrice,
+			disposableCharge: localOrder.disposableCharge || undefined,
+			exception: localOrder.exception || undefined,
+			paymentType: localOrder.paymentType || undefined,
+			type: localOrder.type,
+		};
+
+		printDirectTicket.mutate(dto, {
+			onSuccess: (response: { message: string }) => {
+				toast.success(response.message);
+			},
+			onError: (error: Error) => {
+				toast.danger(error.message || "Error al imprimir el ticket");
 			},
 		});
 	};
@@ -68,6 +94,8 @@ export const PendingOrders = ({ onSwitchToNew }: Props) => {
 	};
 
 	if (pendingOrders.length === 0) return null;
+
+	console.log("pendingOrderas", pendingOrders);
 
 	return (
 		<div className="mt-6">
@@ -138,6 +166,11 @@ export const PendingOrders = ({ onSwitchToNew }: Props) => {
 							<Button className="w-full" isDisabled={createOrder.isPending} onPress={() => handleFinish(localOrder)}>
 								<CheckCircle size={18} />
 								Terminar
+							</Button>
+
+							<Button className="w-full" isDisabled={printDirectTicket.isPending} onPress={() => handlePrint(localOrder)}>
+								<Printer size={18} />
+								Imprimir
 							</Button>
 
 							<Button

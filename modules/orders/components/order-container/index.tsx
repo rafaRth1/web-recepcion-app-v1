@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ArrowUp, ArrowDown } from "lucide-react";
 import { useGetOrders } from "../../hooks/use-get-orders";
 import { useDebounce } from "@/shared/hooks/use-debounce";
 import { Order, OrderType } from "../../interfaces";
@@ -18,6 +19,7 @@ export const OrderContainer = () => {
 	const [selectedTab, setSelectedTab] = useState<"all" | OrderType>("all");
 	const [search, setSearch] = useState("");
 	const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+	const [sortAsc, setSortAsc] = useState(true);
 
 	const debouncedSearch = useDebounce(search, 400);
 
@@ -36,11 +38,17 @@ export const OrderContainer = () => {
 		pickup: processOrders.filter((o) => o.type === "PICKUP").length,
 	};
 
-	const filtered = processOrders.filter((o) => {
-		const matchesTab = selectedTab === "all" || o.type === selectedTab;
-		const matchesSearch = o.nameOrder.toLowerCase().includes(debouncedSearch.toLowerCase());
-		return matchesTab && matchesSearch;
-	});
+	const filtered = processOrders
+		.filter((o) => {
+			const matchesTab = selectedTab === "all" || o.type === selectedTab;
+			const matchesSearch = o.nameOrder.toLowerCase().includes(debouncedSearch.toLowerCase());
+			return matchesTab && matchesSearch;
+		})
+		.sort((a, b) => {
+			const dateA = new Date(a.createdAt).getTime();
+			const dateB = new Date(b.createdAt).getTime();
+			return sortAsc ? dateA - dateB : dateB - dateA;
+		});
 
 	return (
 		<div className="flex h-full flex-col overflow-hidden">
@@ -76,14 +84,21 @@ export const OrderContainer = () => {
 				))}
 			</div>
 
-			{/* Search */}
-			<div className="px-4 py-3">
+			{/* Search + Sort */}
+			<div className="flex gap-2 px-4 py-3">
 				<input
 					value={search}
 					onChange={(e) => setSearch(e.target.value)}
 					placeholder="Buscar por nombre..."
-					className="w-full rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm text-neutral-100 outline-none placeholder:text-neutral-500 focus:border-indigo-500"
+					className="flex-1 rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm text-neutral-100 outline-none placeholder:text-neutral-500 focus:border-indigo-500"
 				/>
+				<button
+					onClick={() => setSortAsc(!sortAsc)}
+					className="flex items-center gap-1 rounded-lg border border-neutral-800 bg-neutral-900 px-3 py-2 text-sm text-neutral-300 transition-colors hover:text-neutral-100"
+					title={sortAsc ? "Más recientes primero" : "Más antiguos primero"}
+				>
+					{sortAsc ? <ArrowUp size={16} /> : <ArrowDown size={16} />}
+				</button>
 			</div>
 
 			{/* Lista */}
